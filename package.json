@@ -1,0 +1,20 @@
+{
+  "name": "bakesmart2d",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:qr": "node scripts/qr-dev.mjs",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "qrcode": "^1.5.4",
+    "typescript": "~5.6.3",
+    "vite": "^6.3.5"
+  }
+}
