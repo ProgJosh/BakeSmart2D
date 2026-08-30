@@ -31,6 +31,12 @@ export class LearnHubScene extends Phaser.Scene {
       .text(cx, 110, 'Choose a Learning Outcome', { fontFamily: FONT, fontSize: '19px', color: HEX.inkSoft })
       .setOrigin(0.5);
 
+    makeButton(this, 92, 74, 144, 46, 'MAIN MENU', () => fadeToScene(this, 'Menu'), {
+      variant: 'flat',
+      fontSize: 15,
+      radius: 23
+    });
+
     OUTCOMES.forEach((outcome, idx) => {
       const y = 215 + idx * 150;
       const card = this.add.container(cx, y);

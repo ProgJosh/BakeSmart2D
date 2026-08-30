@@ -41,8 +41,8 @@ export class StoragePackScene extends Phaser.Scene {
 
   private renderPhase(): void {
     this.clearAll();
-    this.header();
     bgDecor(this);
+    this.header();
 
     if (this.phase === 0) {
       this.renderMcq(LO3_HANDLING.prompt, LO3_HANDLING.options, LO3_HANDLING.fb, 'Handling',

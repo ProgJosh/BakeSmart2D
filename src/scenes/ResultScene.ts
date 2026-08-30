@@ -40,8 +40,10 @@ export class ResultScene extends Phaser.Scene {
 
     makePanel(this, cx, 430, 1040, 500);
 
-    const listTop = 280;
-    const rowH = Math.min(56, Math.floor(430 / result.stages.length));
+    // LO1 has eight stages. Start the feedback list near the top of the panel
+    // so the final row remains clear of the bottom navigation controls.
+    const listTop = 208;
+    const rowH = Math.min(52, Math.floor(400 / Math.max(1, result.stages.length)));
     result.stages.forEach((stage, i) => {
       const y = listTop + i * rowH;
       this.add

@@ -87,7 +87,19 @@ export class LessonScene extends Phaser.Scene {
     const nextLabel = isLast ? 'TAKE THE CHALLENGE' : 'NEXT';
     const nextVariant = isLast ? 'primary' : 'secondary';
 
-    makeButton(this, cx - 160, 680, 180, 58, 'BACK', () => this.prevPage(), { variant: 'secondary', fontSize: 18 });
+    makeButton(
+      this,
+      cx - 160,
+      680,
+      180,
+      58,
+      this.pageIndex === 0 ? 'LEARNING HUB' : 'BACK',
+      () => {
+        if (this.pageIndex === 0) fadeToScene(this, 'LearnHub');
+        else this.prevPage();
+      },
+      { variant: 'secondary', fontSize: 18 }
+    );
     makeButton(this, cx + 180, 680, isLast ? 280 : 180, 58, nextLabel, () => this.nextPage(), { variant: nextVariant, fontSize: 18 });
   }
 
