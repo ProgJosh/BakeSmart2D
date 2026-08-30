@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, HEX } from '../core/theme';
-import { bgDecor, makeButton, fadeToScene, makePanel, makeChip, makeDots } from '../ui/UiFactory';
+import { bgDecor, makeButton, fadeToScene, makePanel, makeChip, makeDots, makeSectionLabel } from '../ui/UiFactory';
 import { findLesson } from '../data/lessons';
 import { GS } from '../core/GameState';
 
@@ -43,24 +43,33 @@ export class LessonScene extends Phaser.Scene {
     const page = this.lesson.pages[this.pageIndex];
     const cx = GAME_W / 2;
 
-    makeChip(this, 150, 54, `${this.lesson.lo} \u00b7 WEEK ${this.lesson.week}`, C.wheat, HEX.ink, 14);
+    makeChip(this, 162, 54, `${this.lesson.lo} \u00b7 WEEK ${this.lesson.week}`, C.wheat, HEX.ink, 14);
+    makeChip(this, GAME_W - 156, 54, `PAGE ${this.pageIndex + 1} OF ${this.lesson.pages.length}`, C.cardWarm, HEX.inkSoft, 13);
 
     this.add
-      .text(100, 96, this.lesson.topic, { fontFamily: FONT, fontSize: '27px', fontStyle: 'bold', color: HEX.ink, wordWrap: { width: 1080 } })
+      .text(100, 100, this.lesson.topic, { fontFamily: FONT, fontSize: '27px', fontStyle: 'bold', color: HEX.ink, wordWrap: { width: 980 } })
       .setOrigin(0, 0.5);
 
-    makePanel(this, cx, 395, 1040, 470);
+    makePanel(this, cx, 404, 1040, 486, C.cardWarm, 28);
+    const book = this.add.graphics();
+    book.fillStyle(C.wheat, 0.45).fillRoundedRect(cx - 505, 185, 14, 432, 7);
+    book.lineStyle(2, C.wheatDark, 0.5).lineBetween(cx - 486, 200, cx - 486, 604);
+    for (let lineY = 325; lineY <= 564; lineY += 48) {
+      book.lineStyle(1, C.wheatDark, 0.18).lineBetween(cx - 440, lineY, cx + 440, lineY);
+    }
 
-    let y = 200;
+    let y = 206;
+    makeSectionLabel(this, cx - 440, y, 'Lesson note', C.primary);
+    y += 34;
     this.add
-      .text(cx, y, page.heading, { fontFamily: FONT, fontSize: '23px', fontStyle: 'bold', color: HEX.primaryDark, wordWrap: { width: 980 } })
-      .setOrigin(0.5);
+      .text(cx - 440, y, page.heading, { fontFamily: FONT, fontSize: '23px', fontStyle: 'bold', color: HEX.primaryDark, wordWrap: { width: 880 } })
+      .setOrigin(0, 0);
     y += 50;
 
     page.body.forEach((paragraph) => {
       const txt = this.add
-        .text(cx, y, paragraph, { fontFamily: FONT, fontSize: '19px', color: HEX.ink, wordWrap: { width: 940 }, lineSpacing: 8 })
-        .setOrigin(0.5, 0);
+        .text(cx - 440, y, paragraph, { fontFamily: FONT, fontSize: '18px', color: HEX.ink, wordWrap: { width: 880 }, lineSpacing: 7 })
+        .setOrigin(0, 0);
       y += txt.height + 16;
     });
 
@@ -75,7 +84,7 @@ export class LessonScene extends Phaser.Scene {
         const bullet = this.add.graphics();
         bullet.fillStyle(C.gold, 1).fillCircle(cx - 470, y + 7, 4);
         this.add
-          .text(cx - 450, y, point, { fontFamily: FONT, fontSize: '17px', color: HEX.ink, wordWrap: { width: 900 } })
+          .text(cx - 420, y, point, { fontFamily: FONT, fontSize: '17px', color: HEX.ink, wordWrap: { width: 850 } })
           .setOrigin(0, 0);
         y += 26;
       });

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, HEX } from '../core/theme';
-import { bgDecor, makeButton, fadeToScene, makeChip, makePanel } from '../ui/UiFactory';
+import { bgDecor, makeButton, fadeToScene, makeChip, makePanel, makeSectionLabel } from '../ui/UiFactory';
 import {
   LO2_TOPPINGS,
   LO2_REQ_BY_DIFFICULTY,
@@ -43,6 +43,7 @@ export class DecorateScene extends Phaser.Scene {
       radius: 28
     });
     makeChip(this, 150, 54, 'LO2 · Week 6', C.wheat, HEX.ink, 14);
+    makeChip(this, GAME_W - 174, 54, 'DECORATION LAB', C.gold, HEX.ink, 13);
     this.add
       .text(150, 92, 'Decoration Activity', { fontFamily: FONT, fontSize: '22px', fontStyle: 'bold', color: HEX.ink })
       .setOrigin(0, 0.5);
@@ -54,10 +55,11 @@ export class DecorateScene extends Phaser.Scene {
     const panelBottom = 690;
     const panelH = panelBottom - panelTop;
     const panelY = (panelTop + panelBottom) / 2;
-    makePanel(this, cx, panelY, 1060, panelH);
+    makePanel(this, cx, panelY, 1060, panelH, C.cardWarm, 28);
+    makeSectionLabel(this, cx - 470, 166, 'Decorate your bakery product', C.gold);
 
     this.add
-      .text(cx, 190, 'Tap a topping to select it, then tap the product to place it.', {
+      .text(cx, 198, 'Tap a topping to select it, then tap the product to place it.', {
         fontFamily: FONT,
         fontSize: '19px',
         color: HEX.primaryDark,
@@ -71,15 +73,25 @@ export class DecorateScene extends Phaser.Scene {
     const pw = 380;
     const ph = 226;
     const prod = this.add.graphics();
-    prod.fillStyle(C.ink, 0.08).fillRoundedRect(px - pw / 2 + 4, py - ph / 2 + 6, pw, ph, 40);
-    prod.fillStyle(0xf3d9a8, 1).fillRoundedRect(px - pw / 2, py - ph / 2, pw, ph, 40);
-    prod.fillStyle(0xe7b873, 1).fillEllipse(px, py - ph / 2 + 20, pw - 40, 60);
-    prod.lineStyle(3, C.crustDark, 0.6).strokeRoundedRect(px - pw / 2, py - ph / 2, pw, ph, 40);
+    prod.fillStyle(C.ink, 0.12).fillEllipse(px + 5, py + 93, 460, 54);
+    prod.fillStyle(0xfaf7ef, 1).fillEllipse(px, py + 82, 456, 60);
+    prod.lineStyle(3, C.wheatDark, 0.6).strokeEllipse(px, py + 82, 456, 60);
+    prod.fillStyle(C.crustDark, 1).fillEllipse(px, py + 3, 382, 194);
+    prod.fillStyle(C.crust, 1).fillEllipse(px, py - 4, 360, 174);
+    prod.fillStyle(0xf0bd74, 1).fillEllipse(px, py - 18, 322, 132);
+    prod.lineStyle(4, C.crustDark, 0.55).strokeEllipse(px, py - 4, 360, 174);
+    for (const sx of [-90, 0, 90]) {
+      prod.lineStyle(7, C.crustDark, 0.58);
+      prod.beginPath();
+      prod.moveTo(px + sx - 20, py - 48);
+      prod.lineTo(px + sx + 20, py + 16);
+      prod.strokePath();
+    }
 
     const placedLayer = this.add.container(0, 0);
 
     const statusText = this.add
-      .text(cx, 508, '', { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
+      .text(cx, 514, '', { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
       .setOrigin(0.5);
     const updateStatus = () => {
       const kinds = new Set(this.placements.map((p) => p.kind)).size;
@@ -103,11 +115,11 @@ export class DecorateScene extends Phaser.Scene {
     });
 
     this.add
-      .text(cx, 540, 'TOPPINGS', { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.inkSoft })
+      .text(cx, 548, 'TOPPING PALETTE', { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.inkSoft })
       .setOrigin(0.5)
       .setLetterSpacing(2);
 
-    const paletteY = 580;
+    const paletteY = 590;
     const startX = cx - (LO2_TOPPINGS.length - 1) * 95;
     LO2_TOPPINGS.forEach((t, i) => {
       const x = startX + i * 190;
@@ -143,7 +155,7 @@ export class DecorateScene extends Phaser.Scene {
       });
     };
 
-    makeButton(this, cx, 654, 280, 54, 'SUBMIT DECORATION', () => {
+    makeButton(this, cx, 660, 280, 54, 'SUBMIT DECORATION', () => {
       const count = this.placements.length;
       const kinds = new Set(this.placements.map((p) => p.kind)).size;
       const score = (count >= req.count ? 50 : 0) + (kinds >= req.kinds ? 50 : 0);
@@ -157,7 +169,7 @@ export class DecorateScene extends Phaser.Scene {
 
     this.renderHint(`Use at least ${req.count} toppings and ${req.kinds} different kinds so the product looks balanced and appealing.`);
     this.add
-      .text(cx, 700, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '15px', color: HEX.inkSoft })
+      .text(cx, 706, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '15px', color: HEX.inkSoft })
       .setOrigin(0.5);
   }
 
@@ -184,9 +196,11 @@ export class DecorateScene extends Phaser.Scene {
       radius: 28
     });
     makeChip(this, 150, 54, 'LO2 · Week 6', C.wheat, HEX.ink, 14);
+    makeChip(this, GAME_W - 174, 54, 'PRESENTATION CHECK', C.gold, HEX.ink, 13);
     this.add.text(150, 96, 'Presentation', { fontFamily: FONT, fontSize: '22px', fontStyle: 'bold', color: HEX.ink }).setOrigin(0, 0.5);
 
-    makePanel(this, cx, 410, 1060, 540);
+    makePanel(this, cx, 410, 1060, 540, C.cardWarm, 28);
+    makeSectionLabel(this, cx - 470, 205, 'Finish with a professional presentation', C.gold);
     this.add
       .text(cx, 260, LO2_PRESENTATION.prompt, { fontFamily: FONT, fontSize: '22px', color: HEX.ink, wordWrap: { width: 980 }, align: 'center' })
       .setOrigin(0.5);

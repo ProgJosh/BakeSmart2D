@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { FONT, GAME_W, HEX } from '../core/theme';
-import { bgDecor, makeOptionTile, makeButton, fadeToScene, makeChip } from '../ui/UiFactory';
+import { C, FONT, GAME_W, HEX } from '../core/theme';
+import { bgDecor, makeOptionTile, makeButton, fadeToScene, makeChip, makePanel, makeSectionLabel } from '../ui/UiFactory';
 import { DIFFICULTY_LIST } from '../data/challenges';
 import { GS } from '../core/GameState';
 import { OUTCOMES } from '../data/lessons';
@@ -38,7 +38,9 @@ export class DifficultyScene extends Phaser.Scene {
       radius: 28
     });
 
-    makeChip(this, cx - 350, 82, this.lo, outcome.color, HEX.white, 15);
+    // Keep the learning-outcome marker separate from the page title so LO1,
+    // LO2, and LO3 remain immediately readable at every difficulty screen.
+    makeChip(this, GAME_W - 166, 92, `${this.lo} · LEARNING OUTCOME`, outcome.color, HEX.white, 13);
 
     this.add
       .text(140, 82, 'Select Difficulty', { fontFamily: FONT, fontSize: '28px', fontStyle: 'bold', color: HEX.ink })
@@ -48,13 +50,13 @@ export class DifficultyScene extends Phaser.Scene {
       .text(140, 118, outcome.title, { fontFamily: FONT, fontSize: '18px', color: HEX.inkSoft })
       .setOrigin(0, 0.5);
 
-    const underline = this.add.graphics();
-    underline.fillStyle(outcome.color, 1).fillRect(140, 148, 300, 4);
+    makePanel(this, cx, 424, 920, 530, C.cardWarm, 28);
+    makeSectionLabel(this, 140, 148, 'Choose how much guidance you want', outcome.color);
 
     const diffTiles: Map<string, ReturnType<typeof makeOptionTile>> = new Map();
 
     DIFFICULTY_LIST.forEach((diff, idx) => {
-      const y = 245 + idx * 130;
+      const y = 250 + idx * 130;
       const tile = makeOptionTile(
         this,
         cx,
@@ -80,7 +82,7 @@ export class DifficultyScene extends Phaser.Scene {
     const continueBtn = makeButton(
       this,
       cx,
-      650,
+      640,
       320,
       68,
       'CONTINUE',
@@ -95,7 +97,7 @@ export class DifficultyScene extends Phaser.Scene {
     continueBtn.setEnabled(true);
 
     this.add
-      .text(cx, 730, 'Hint tokens and scoring vary by difficulty', { fontFamily: FONT, fontSize: '14px', color: HEX.inkSoft })
+      .text(cx, 704, 'Hint tokens and scoring vary by difficulty', { fontFamily: FONT, fontSize: '14px', color: HEX.inkSoft })
       .setOrigin(0.5)
       .setAlpha(0.7);
 

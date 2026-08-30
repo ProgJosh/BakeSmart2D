@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { FONT, GAME_W, HEX } from '../core/theme';
-import { bgDecor, makeButton, fadeToScene, makePanel, makeStars } from '../ui/UiFactory';
+import { C, FONT, GAME_W, HEX } from '../core/theme';
+import { bgDecor, makeButton, fadeToScene, makePanel, makeStars, makeChip, makeSectionLabel } from '../ui/UiFactory';
 import { GS } from '../core/GameState';
 
 export class ResultScene extends Phaser.Scene {
@@ -19,45 +19,53 @@ export class ResultScene extends Phaser.Scene {
       return;
     }
 
+    makeChip(this, cx, 48, `${result.lo} · ${result.difficultyLabel.toUpperCase()} MODE`, C.wheat, HEX.ink, 14);
+
     this.add
-      .text(cx, 56, `${result.lo} · ${result.difficultyLabel}`, {
+      .text(cx, 92, 'Baking session complete!', {
         fontFamily: FONT,
-        fontSize: '26px',
+        fontSize: '28px',
         fontStyle: 'bold',
         color: HEX.ink
       })
       .setOrigin(0.5);
 
-    makeStars(this, cx, 120, 22, result.stars);
+    makeStars(this, cx, 132, 22, result.stars);
 
     this.add
-      .text(cx, 168, `Accuracy ${result.accuracy}%   ·   Score ${result.total}/${result.maxTotal}`, {
+      .text(cx, 172, `Accuracy ${result.accuracy}%   ·   Score ${result.total}/${result.maxTotal}`, {
         fontFamily: FONT,
         fontSize: '18px',
         color: HEX.inkSoft
       })
       .setOrigin(0.5);
 
-    makePanel(this, cx, 430, 1040, 500);
+    makePanel(this, cx, 430, 1040, 500, C.cardWarm, 28);
+    makeSectionLabel(this, cx - 455, 204, 'Stage performance', C.primary);
 
     // LO1 has eight stages. Start the feedback list near the top of the panel
     // so the final row remains clear of the bottom navigation controls.
-    const listTop = 208;
+    const listTop = 224;
     const rowH = Math.min(52, Math.floor(400 / Math.max(1, result.stages.length)));
     result.stages.forEach((stage, i) => {
       const y = listTop + i * rowH;
+      const stageColor = stage.score === stage.max ? C.green : stage.score > 0 ? C.gold : C.primary;
+      this.add.circle(cx - 432, y + 8, 6, stageColor);
       this.add
-        .text(cx - 455, y, `${stage.label}`, { fontFamily: FONT, fontSize: '15px', fontStyle: 'bold', color: HEX.ink, wordWrap: { width: 430 } })
+        .text(cx - 414, y, `${stage.label}`, { fontFamily: FONT, fontSize: '15px', fontStyle: 'bold', color: HEX.ink, wordWrap: { width: 400 } })
         .setOrigin(0, 0);
       this.add
-        .text(cx - 455, y + 20, stage.feedback, { fontFamily: FONT, fontSize: '12px', color: HEX.inkSoft, wordWrap: { width: 620 }, lineSpacing: 2 })
+        .text(cx - 414, y + 20, stage.feedback, { fontFamily: FONT, fontSize: '12px', color: HEX.inkSoft, wordWrap: { width: 590 }, lineSpacing: 2 })
         .setOrigin(0, 0);
       this.add
-        .text(cx + 480, y + 6, `${stage.score}/${stage.max}`, { fontFamily: FONT, fontSize: '16px', fontStyle: 'bold', color: HEX.primaryDark })
+        .text(cx + 480, y + 6, `${stage.score}/${stage.max}`, { fontFamily: FONT, fontSize: '16px', fontStyle: 'bold', color: stageColor === C.green ? HEX.green : HEX.primaryDark })
         .setOrigin(1, 0);
+      if (i < result.stages.length - 1) {
+        this.add.rectangle(cx, y + rowH - 6, 890, 1, C.wheatDark, 0.34).setOrigin(0.5);
+      }
     });
 
-    makeButton(this, cx - 170, 690, 300, 60, 'BACK TO LEARNING HUB', () => fadeToScene(this, 'LearnHub'), {
+    makeButton(this, cx - 170, 690, 300, 60, 'CONTINUE LEARNING', () => fadeToScene(this, 'LearnHub'), {
       variant: 'primary',
       fontSize: 19,
       radius: 30

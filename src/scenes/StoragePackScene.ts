@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, HEX } from '../core/theme';
-import { bgDecor, makeButton, fadeToScene, makeChip, makePanel } from '../ui/UiFactory';
+import { bgDecor, makeButton, fadeToScene, makeChip, makePanel, makeSectionLabel } from '../ui/UiFactory';
 import { LO3_HANDLING, LO3_DESTS, LO3_PAIRS, LO3_PACKAGING } from '../data/challenges';
 import { GS, type StageRecord } from '../core/GameState';
 
@@ -26,17 +26,17 @@ export class StoragePackScene extends Phaser.Scene {
   }
 
   private header(): void {
-    const cx = GAME_W / 2;
+    const phaseLabel = ['HANDLING · 1 OF 3', 'STORAGE · 2 OF 3', 'PACKAGING · 3 OF 3'][this.phase];
     makeButton(this, 70, 82, 56, 56, '⟵', () => fadeToScene(this, 'LearnHub'), {
       variant: 'flat',
       fontSize: 28,
       radius: 28
     });
     makeChip(this, 150, 54, 'LO3 · Week 7', C.wheat, HEX.ink, 14);
+    makeChip(this, GAME_W - 170, 54, phaseLabel, C.green, HEX.white, 13);
     this.add
       .text(150, 96, 'Storage & Packaging', { fontFamily: FONT, fontSize: '22px', fontStyle: 'bold', color: HEX.ink })
       .setOrigin(0, 0.5);
-    void cx;
   }
 
   private renderPhase(): void {
@@ -85,7 +85,8 @@ export class StoragePackScene extends Phaser.Scene {
     onDone: () => void
   ): void {
     const cx = GAME_W / 2;
-    makePanel(this, cx, 410, 1060, 540);
+    makePanel(this, cx, 410, 1060, 540, C.cardWarm, 28);
+    makeSectionLabel(this, cx - 470, 205, `${label} decision`, C.green);
     this.add
       .text(cx, 260, prompt, { fontFamily: FONT, fontSize: '22px', color: HEX.ink, wordWrap: { width: 980 }, align: 'center' })
       .setOrigin(0.5);
@@ -143,7 +144,8 @@ export class StoragePackScene extends Phaser.Scene {
 
   private renderMatching(): void {
     const cx = GAME_W / 2;
-    makePanel(this, cx, 400, 1060, 540);
+    makePanel(this, cx, 400, 1060, 540, C.cardWarm, 28);
+    makeSectionLabel(this, cx - 470, 202, 'Storage matching', C.green);
     this.add
       .text(cx, 250, 'Match each product with the correct storage place.', {
         fontFamily: FONT,

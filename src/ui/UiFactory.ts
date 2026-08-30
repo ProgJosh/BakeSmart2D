@@ -14,10 +14,28 @@ type Variant = 'primary' | 'secondary' | 'flat' | 'danger';
 
 export function bgDecor(scene: Phaser.Scene): void {
   const g = scene.add.graphics();
-  g.fillStyle(C.page, 1).fillRect(0, 0, GAME_W, GAME_H);
-  g.fillStyle(C.wheat, 0.4).fillCircle(-70, -50, 230);
-  g.fillStyle(C.wheat, 0.32).fillCircle(GAME_W + 50, GAME_H + 40, 270);
-  g.fillStyle(C.crust, 0.14).fillRect(0, GAME_H - 12, GAME_W, 12);
+  g.fillGradientStyle(C.pageWarm, C.pageWarm, C.page, C.wheat, 1);
+  g.fillRect(0, 0, GAME_W, GAME_H);
+
+  // Lightweight original bakery interior: an awning, soft wall ornaments,
+  // and a wooden worktop. It deliberately stays behind scene content.
+  g.fillStyle(C.cardWarm, 0.94).fillRect(0, 0, GAME_W, 52);
+  for (let x = -28, stripe = 0; x < GAME_W + 36; x += 72, stripe++) {
+    g.fillStyle(stripe % 2 === 0 ? C.primary : C.wheat, 0.72).fillTriangle(x, 0, x + 42, 0, x + 22, 52);
+  }
+  g.fillStyle(C.wheat, 0.3).fillCircle(-64, 170, 220);
+  g.fillStyle(C.peach, 0.25).fillCircle(GAME_W + 55, 185, 250);
+  g.fillStyle(C.card, 0.54).fillRoundedRect(60, 92, 146, 118, 24);
+  g.fillStyle(C.card, 0.54).fillRoundedRect(GAME_W - 206, 92, 146, 118, 24);
+  g.lineStyle(3, C.wheatDark, 0.28).strokeRoundedRect(60, 92, 146, 118, 24);
+  g.lineStyle(3, C.wheatDark, 0.28).strokeRoundedRect(GAME_W - 206, 92, 146, 118, 24);
+  g.fillStyle(C.gold, 0.26).fillCircle(133, 151, 30);
+  g.fillStyle(C.green, 0.2).fillCircle(GAME_W - 133, 151, 30);
+  g.fillStyle(C.crustDark, 0.2).fillRect(0, GAME_H - 62, GAME_W, 62);
+  g.fillStyle(C.crust, 0.38).fillRect(0, GAME_H - 62, GAME_W, 8);
+  for (let x = 0; x < GAME_W; x += 74) {
+    g.lineStyle(1, C.cocoa, 0.12).lineBetween(x, GAME_H - 54, x + 50, GAME_H);
+  }
 }
 
 export function makePanel(
@@ -26,13 +44,15 @@ export function makePanel(
   y: number,
   w: number,
   h: number,
-  fill = C.card,
+  fill: number = C.card,
   radius = 22
 ): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics();
-  g.fillStyle(C.ink, 0.08).fillRoundedRect(x - w / 2 + 4, y - h / 2 + 7, w, h, radius);
+  g.fillStyle(C.ink, 0.12).fillRoundedRect(x - w / 2 + 5, y - h / 2 + 9, w, h, radius);
+  g.fillStyle(C.wheat, 0.45).fillRoundedRect(x - w / 2 + 2, y - h / 2 + 3, w, h, radius);
   g.fillStyle(fill, 1).fillRoundedRect(x - w / 2, y - h / 2, w, h, radius);
-  g.lineStyle(2, C.wheatDark, 0.7).strokeRoundedRect(x - w / 2, y - h / 2, w, h, radius);
+  g.lineStyle(2, C.wheatDark, 0.86).strokeRoundedRect(x - w / 2, y - h / 2, w, h, radius);
+  g.lineStyle(2, 0xffffff, 0.62).lineBetween(x - w / 2 + radius, y - h / 2 + 3, x + w / 2 - radius, y - h / 2 + 3);
   return g;
 }
 
@@ -64,9 +84,11 @@ export function makeButton(
     const fill =
       variant === 'primary' ? C.primary : variant === 'danger' ? C.red : variant === 'flat' ? C.wheat : C.card;
     const edge = variant === 'primary' ? C.primaryDark : variant === 'danger' ? 0x9c4638 : C.wheatDark;
-    g.fillStyle(C.ink, 0.12).fillRoundedRect(-w / 2 + 3, -h / 2 + 6, w, h, r);
+    g.fillStyle(C.ink, 0.15).fillRoundedRect(-w / 2 + 3, -h / 2 + 7, w, h, r);
+    g.fillStyle(C.wheat, variant === 'primary' ? 0.34 : 0.5).fillRoundedRect(-w / 2 + 1, -h / 2 + 3, w, h, r);
     g.fillStyle(fill, 1).fillRoundedRect(-w / 2, -h / 2, w, h, r);
-    g.lineStyle(2, edge, 0.9).strokeRoundedRect(-w / 2, -h / 2, w, h, r);
+    g.lineStyle(2, edge, 0.95).strokeRoundedRect(-w / 2, -h / 2, w, h, r);
+    g.lineStyle(2, 0xffffff, variant === 'primary' ? 0.3 : 0.72).lineBetween(-w / 2 + r, -h / 2 + 3, w / 2 - r, -h / 2 + 3);
   };
   const zone = scene.add.zone(0, 0, w, h).setInteractive({ useHandCursor: true });
   zone.on('pointerdown', () => {
@@ -135,9 +157,10 @@ export function makeOptionTile(
   let enabled = true;
   const paint = () => {
     g.clear();
-    g.fillStyle(C.ink, 0.07).fillRoundedRect(-w / 2 + 3, -h / 2 + 5, w, h, 14);
+    g.fillStyle(C.ink, 0.11).fillRoundedRect(-w / 2 + 3, -h / 2 + 7, w, h, 14);
+    g.fillStyle(C.wheat, 0.42).fillRoundedRect(-w / 2 + 1, -h / 2 + 3, w, h, 14);
     g.fillStyle(selected ? 0xfff3dd : C.card, 1).fillRoundedRect(-w / 2, -h / 2, w, h, 14);
-    g.lineStyle(selected ? 4 : 2, selected ? C.primary : C.wheatDark, 1).strokeRoundedRect(
+    g.lineStyle(selected ? 4 : 2, selected ? C.primary : C.wheatDark, 0.95).strokeRoundedRect(
       -w / 2,
       -h / 2,
       w,
@@ -191,11 +214,16 @@ export function makeChip(
   const w = t.width + 30;
   const h = 34;
   const g = scene.add.graphics();
+  g.fillStyle(C.ink, 0.1).fillRoundedRect(-w / 2 + 2, -h / 2 + 3, w, h, h / 2);
   g.fillStyle(bg, 1).fillRoundedRect(-w / 2, -h / 2, w, h, h / 2);
+  g.lineStyle(1, C.wheatDark, 0.75).strokeRoundedRect(-w / 2, -h / 2, w, h, h / 2);
   return scene.add.container(x, y, [g, t]);
 }
 
 export function makeDots(scene: Phaser.Scene, cx: number, y: number, total: number, current: number): void {
+  if (total > 1) {
+    scene.add.rectangle(cx, y, (total - 1) * 28, 3, C.wheatDark, 0.45).setOrigin(0.5);
+  }
   for (let i = 0; i < total; i++) {
     const active = i === current;
     const done = i < current;
@@ -208,6 +236,14 @@ export function makeStars(scene: Phaser.Scene, cx: number, y: number, size: numb
     const s = scene.add.star(cx + (i - 1) * size * 2.4, y, 5, size * 0.5, size, i < filled ? C.gold : C.mutedStar);
     s.setStrokeStyle(2, 0xb99a55, 0.8);
   }
+}
+
+export function makeSectionLabel(scene: Phaser.Scene, x: number, y: number, label: string, color: number = C.primary): void {
+  scene.add
+    .text(x, y, label.toUpperCase(), { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.inkSoft })
+    .setOrigin(0, 0.5)
+    .setLetterSpacing(2);
+  scene.add.rectangle(x + 12, y + 18, 74, 4, color, 0.95).setOrigin(0, 0.5);
 }
 
 export function fadeToScene(scene: Phaser.Scene, key: string, data?: Record<string, unknown>): void {

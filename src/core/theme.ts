@@ -5,11 +5,15 @@ export const FONT = '"Trebuchet MS", "Segoe UI", Verdana, sans-serif';
 
 export const C = {
   page: 0xfdf4e6,
+  pageWarm: 0xfff8ed,
   card: 0xffffff,
+  cardWarm: 0xfffbf3,
   wheat: 0xefdcb8,
   wheatDark: 0xd8bf92,
+  peach: 0xf3d9ba,
   crust: 0xc98a4b,
   crustDark: 0xa96b33,
+  cocoa: 0x6b3d1f,
   primary: 0xd97b29,
   primaryDark: 0xa85a14,
   ink: 0x40260f,
@@ -18,6 +22,7 @@ export const C = {
   green: 0x55935f,
   greenDark: 0x3f7349,
   red: 0xc75b4a,
+  blue: 0x7195a6,
   mutedStar: 0xdccdb4
 } as const;
 

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, GAME_H, HEX } from '../core/theme';
-import { bgDecor, makeButton, fadeToScene, makeChip, makePanel } from '../ui/UiFactory';
+import { bgDecor, makeButton, fadeToScene, makeChip, makePanel, makeSectionLabel } from '../ui/UiFactory';
 import {
   LO1_STAGES,
   DIFFICULTIES,
@@ -70,7 +70,18 @@ export class ChallengeScene extends Phaser.Scene {
       .text(150, 130, stage.label, { fontFamily: FONT, fontSize: '17px', color: HEX.inkSoft })
       .setOrigin(0, 0.5);
 
+    const progressW = 270;
+    const progressX = GAME_W - 205;
+    const progress = this.add.graphics();
+    progress.fillStyle(C.wheat, 0.85).fillRoundedRect(progressX - progressW / 2, 78, progressW, 14, 7);
+    progress.fillStyle(C.primary, 1).fillRoundedRect(progressX - progressW / 2, 78, progressW * ((this.index + 1) / this.stages.length), 14, 7);
+    progress.lineStyle(1, C.wheatDark, 0.9).strokeRoundedRect(progressX - progressW / 2, 78, progressW, 14, 7);
+    this.add
+      .text(progressX, 62, `BAKE PATH  ${this.index + 1} / ${this.stages.length}`, { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.inkSoft })
+      .setOrigin(0.5);
+
     makePanel(this, cx, 410, 1060, 540);
+    makeSectionLabel(this, cx - 470, 202, 'Your baking task', C.primary);
 
     this.add
       .text(cx, 250, stage.prompt, {
@@ -321,7 +332,7 @@ export class ChallengeScene extends Phaser.Scene {
     this.showFeedback(feedback, finalScore);
   }
 
-  private showFeedback(feedback: string, _score: number): void {
+  private showFeedback(feedback: string, score: number): void {
     const cx = GAME_W / 2;
     const overlay = this.add.container(0, 0).setDepth(1000);
     const shade = this.add.graphics();
@@ -341,9 +352,11 @@ export class ChallengeScene extends Phaser.Scene {
         .setOrigin(0.5)
     );
 
+    overlay.add(makeChip(this, cx, 364, `${score}/100 STAGE SCORE`, score === 100 ? C.green : C.wheat, score === 100 ? HEX.white : HEX.ink, 13));
+
     overlay.add(
       this.add
-        .text(cx, 380, feedback, { fontFamily: FONT, fontSize: '19px', color: HEX.ink, wordWrap: { width: w - 80 }, align: 'center', lineSpacing: 6 })
+        .text(cx, 404, feedback, { fontFamily: FONT, fontSize: '19px', color: HEX.ink, wordWrap: { width: w - 80 }, align: 'center', lineSpacing: 6 })
         .setOrigin(0.5, 0)
     );
 

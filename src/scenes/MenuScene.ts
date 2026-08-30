@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, HEX } from '../core/theme';
-import { bgDecor, fadeToScene, makeButton } from '../ui/UiFactory';
+import { bgDecor, fadeToScene, makeButton, makeChip, makePanel } from '../ui/UiFactory';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -10,6 +10,21 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     bgDecor(this);
     const cx = GAME_W / 2;
+
+    makeChip(this, cx, 82, 'BAKERY LEARNING STUDIO', C.wheat, HEX.ink, 14);
+    const leftNote = makePanel(this, 210, 320, 238, 164, C.cardWarm, 22);
+    leftNote.setAlpha(0.94);
+    this.add.text(104, 265, 'TODAY\'S RECIPE', { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.primaryDark }).setLetterSpacing(2);
+    this.add.text(104, 300, 'Learn the craft\nof great baking.', { fontFamily: FONT, fontSize: '21px', fontStyle: 'bold', color: HEX.ink, lineSpacing: 5 });
+    this.add.text(104, 372, 'Study · Practise · Improve', { fontFamily: FONT, fontSize: '14px', color: HEX.inkSoft });
+
+    const rightNote = makePanel(this, 1070, 320, 224, 164, C.cardWarm, 22);
+    rightNote.setAlpha(0.94);
+    this.add.text(972, 265, 'YOUR KITCHEN', { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.primaryDark }).setLetterSpacing(2);
+    ['Lessons', 'Challenges', 'Feedback'].forEach((label, i) => {
+      this.add.circle(986, 306 + i * 30, 6, [C.gold, C.primary, C.green][i]);
+      this.add.text(1004, 306 + i * 30, label, { fontFamily: FONT, fontSize: '16px', color: HEX.ink }).setOrigin(0, 0.5);
+    });
 
     const art = this.add.container(cx, 218);
 
@@ -56,26 +71,35 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0, 0.5);
     const totalW = t1.width + 12 + t2.width;
     t1.x = cx - totalW / 2;
-    t1.y = 408;
+    t1.y = 424;
     t2.x = t1.x + t1.width + 12;
-    t2.y = 408;
+    t2.y = 424;
 
     this.add
-      .text(cx, 456, 'An Interactive Bread & Bakery Learning Game', {
+      .text(cx, 470, 'An interactive bread & bakery learning game', {
         fontFamily: FONT,
         fontSize: '21px',
         color: HEX.inkSoft
       })
       .setOrigin(0.5);
 
-    makeButton(this, cx, 552, 360, 76, 'START LEARNING', () => fadeToScene(this, 'LearnHub'), {
+    makeButton(this, cx, 560, 386, 78, 'START LEARNING', () => fadeToScene(this, 'LearnHub'), {
       variant: 'primary',
       fontSize: 25,
       radius: 38
     });
 
     this.add
-      .text(cx, 690, 'Practical Research Prototype · BakeSmart2D v0.1', {
+      .text(cx, 638, 'Mouse · touch · keyboard ready', {
+        fontFamily: FONT,
+        fontSize: '15px',
+        color: HEX.inkSoft
+      })
+      .setOrigin(0.5)
+      .setAlpha(0.85);
+
+    this.add
+      .text(cx, 690, 'BakeSmart2D · practical bakery learning', {
         fontFamily: FONT,
         fontSize: '15px',
         color: HEX.inkSoft
