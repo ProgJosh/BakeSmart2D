@@ -1,20 +1,69 @@
 {
   "name": "bakesmart2d",
+  "productName": "BakeSmart2D",
   "private": true,
   "version": "0.1.0",
+  "description": "A cross-platform 2D educational bakery learning game.",
+  "author": "BakeSmart2D Project",
+  "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:qr": "node scripts/qr-dev.mjs",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "desktop:dev": "npm run build && electron .",
+    "desktop:dir": "npm run build && electron-builder --win dir --x64",
+    "desktop:package": "npm run build && electron-builder --win nsis --x64"
   },
   "dependencies": {
     "phaser": "^3.90.0"
   },
   "devDependencies": {
+    "electron": "44.0.0",
+    "electron-builder": "26.15.3",
     "qrcode": "^1.5.4",
     "typescript": "~5.6.3",
     "vite": "^6.3.5"
+  },
+  "build": {
+    "appId": "com.bakesmart2d.app",
+    "productName": "BakeSmart2D",
+    "asar": true,
+    "compression": "maximum",
+    "electronLanguages": [
+      "en-US"
+    ],
+    "directories": {
+      "output": "release/windows"
+    },
+    "files": [
+      "!node_modules/**/*",
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "executableName": "BakeSmart2D",
+      "artifactName": "BakeSmart2D Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "BakeSmart2D",
+      "uninstallDisplayName": "BakeSmart2D",
+      "runAfterFinish": true
+    }
   }
 }
