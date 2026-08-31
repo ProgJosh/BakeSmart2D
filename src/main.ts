@@ -10,6 +10,9 @@ import { DecorateScene } from './scenes/DecorateScene';
 import { StoragePackScene } from './scenes/StoragePackScene';
 import { ResultScene } from './scenes/ResultScene';
 import { installPlatformRuntime } from './core/PlatformRuntime';
+import { BakeryIntroScene } from './scenes/BakeryIntroScene';
+import { BakeStationIntroScene } from './scenes/BakeStationIntroScene';
+import { LO1RevealScene } from './scenes/LO1RevealScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -31,10 +34,13 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [
     BootScene,
     MenuScene,
+    BakeryIntroScene,
     LearnHubScene,
     LessonScene,
     DifficultyScene,
+    BakeStationIntroScene,
     ChallengeScene,
+    LO1RevealScene,
     DecorateScene,
     StoragePackScene,
     ResultScene

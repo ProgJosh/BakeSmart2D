@@ -13,6 +13,7 @@ import {
 } from '../data/challenges';
 import { GS, type StageRecord } from '../core/GameState';
 import { UI_LAYOUT } from '../core/layout';
+import { animateFeedbackPanel, scoreGain } from '../systems/FeedbackAnimator';
 
 export class ChallengeScene extends Phaser.Scene {
   private stages: AnyStage[] = [];
@@ -375,7 +376,7 @@ export class ChallengeScene extends Phaser.Scene {
       overlay.destroy();
       if (isLast) {
         const result = GS.finishActivity('LO1', 'LO1 baking challenge complete', this.records);
-        fadeToScene(this, 'Result', { result });
+        fadeToScene(this, 'LO1Reveal', { result });
       } else {
         this.index++;
         this.hintUsedThisStage = false;
@@ -383,5 +384,7 @@ export class ChallengeScene extends Phaser.Scene {
       }
     }, { variant: 'primary', fontSize: 20, radius: 28, once: true });
     overlay.add(btn);
+    animateFeedbackPanel(this, overlay, score === 100 ? 'correct' : 'incorrect', cx, 338);
+    scoreGain(this, cx + 306, 362, score);
   }
 }

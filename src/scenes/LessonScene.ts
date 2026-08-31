@@ -4,6 +4,8 @@ import { bgDecor, makeButton, fadeToScene, makePanel, makeChip, makeDots, makeSe
 import { findLesson } from '../data/lessons';
 import { GS } from '../core/GameState';
 import { UI_LAYOUT } from '../core/layout';
+import { AudioManager } from '../systems/AudioManager';
+import { bookCloseTransition, cameraFadeIn } from '../systems/CinematicTransitions';
 
 interface LessonData {
   lessonId: string;
@@ -12,6 +14,7 @@ interface LessonData {
 export class LessonScene extends Phaser.Scene {
   private lesson: ReturnType<typeof findLesson> | null = null;
   private pageIndex = 0;
+  private transitioning = false;
 
   constructor() {
     super('Lesson');
@@ -20,11 +23,13 @@ export class LessonScene extends Phaser.Scene {
   init(data: LessonData): void {
     this.lesson = findLesson(data.lessonId);
     this.pageIndex = 0;
+    this.transitioning = false;
   }
 
   create(): void {
     this.renderPage();
     this.setupKeyboard();
+    void cameraFadeIn(this, 220);
   }
 
   private setupKeyboard(): void {
@@ -114,19 +119,35 @@ export class LessonScene extends Phaser.Scene {
   }
 
   private prevPage(): void {
+    if (this.transitioning) return;
     if (this.pageIndex > 0) {
+      new AudioManager(this).play('pageTurn', { volume: 0.55 });
       this.pageIndex--;
       this.renderPage();
     }
   }
 
   private nextPage(): void {
+    if (this.transitioning) return;
     if (this.pageIndex < (this.lesson?.pages.length ?? 1) - 1) {
+      new AudioManager(this).play('pageTurn', { volume: 0.55 });
       this.pageIndex++;
       this.renderPage();
     } else if (this.lesson) {
-      GS.markViewed(this.lesson.id);
-      fadeToScene(this, 'Difficulty', { lo: this.lesson.lo, lessonId: this.lesson.id });
+      void this.closeBookAndContinue();
     }
+  }
+
+  private async closeBookAndContinue(): Promise<void> {
+    if (!this.lesson || this.transitioning) return;
+    this.transitioning = true;
+    this.input.enabled = false;
+    new AudioManager(this).play('pageTurn', { volume: 0.65 });
+    GS.markViewed(this.lesson.id);
+    await bookCloseTransition(this, 320);
+    if (!this.sys.isActive()) return;
+    const data = { lo: this.lesson.lo, lessonId: this.lesson.id };
+    this.input.enabled = true;
+    fadeToScene(this, 'Difficulty', data);
   }
 }

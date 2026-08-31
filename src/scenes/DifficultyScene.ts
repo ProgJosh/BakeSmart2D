@@ -90,7 +90,7 @@ export class DifficultyScene extends Phaser.Scene {
       () => {
         GS.difficulty = this.selectedDifficulty;
         GS.startActivity(DIFFICULTY_LIST.find(d => d.id === this.selectedDifficulty)?.hints ?? 0);
-        const targetScene = this.lo === 'LO1' ? 'Challenge' : this.lo === 'LO2' ? 'Decorate' : 'StoragePack';
+        const targetScene = this.lo === 'LO1' ? 'BakeStationIntro' : this.lo === 'LO2' ? 'Decorate' : 'StoragePack';
         fadeToScene(this, targetScene, { lo: this.lo });
       },
       { variant: 'primary', fontSize: 22, radius: 34 }

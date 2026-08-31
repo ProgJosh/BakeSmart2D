@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, HEX } from '../core/theme';
 import { bgDecor, fadeToScene, makeButton, makeChip, makePanel } from '../ui/UiFactory';
+import { STORY_PROGRESS } from '../story/StoryProgress';
 
 export class MenuScene extends Phaser.Scene {
   constructor() {
@@ -83,7 +84,7 @@ export class MenuScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    makeButton(this, cx, 560, 386, 78, 'START LEARNING', () => fadeToScene(this, 'LearnHub'), {
+    makeButton(this, cx, 560, 386, 78, 'START LEARNING', () => this.startLearning(), {
       variant: 'primary',
       fontSize: 25,
       radius: 38
@@ -107,6 +108,11 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setAlpha(0.75);
 
-    this.input.keyboard?.once('keydown-ENTER', () => fadeToScene(this, 'LearnHub'));
+    this.input.keyboard?.once('keydown-ENTER', () => this.startLearning());
+  }
+
+  private startLearning(): void {
+    const target = STORY_PROGRESS.isComplete('bakery-introduction') ? 'LearnHub' : 'BakeryIntro';
+    fadeToScene(this, target);
   }
 }
