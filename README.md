@@ -1,6 +1,6 @@
 # BakeSmart2D
 
-BakeSmart2D is a Phaser 3.90 and TypeScript educational bakery game. Vite produces the shared web game, and Electron packages that same production output as the Windows application.
+BakeSmart2D is a Phaser 3.90 and TypeScript educational bakery game. Vite produces the shared web game, Electron packages that output for Windows, and Capacitor packages it for Android.
 
 ## Development
 
@@ -66,3 +66,55 @@ release/windows/
 
 Do not manually rename packaging outputs, because generated metadata may refer to their configured names.
 
+## Android client installation
+
+The current Android deliverable is a debug-signed APK intended for client testing. It is not a production Play Store release.
+
+1. Transfer `app-debug.apk` to the Android phone.
+2. Open the APK on the phone.
+3. If Android prompts for it, allow the file-transfer or browser application to install unknown apps.
+4. Install BakeSmart2D.
+5. Open BakeSmart2D from the application launcher.
+6. Rotate the phone to landscape if necessary.
+7. Play.
+
+The Android application bundles the same Vite production game used by the web and Windows versions. Core gameplay does not require Chrome, Node.js, npm, a development server, localhost, or an internet connection.
+
+## Android developer workflow
+
+Prerequisites:
+
+- Node.js 22.12 or newer and npm
+- Android SDK Platform 36, Build Tools 36, and Platform Tools
+- JDK 17 through 24; JDK 21 is recommended for the included Gradle 8.14.3 wrapper
+- A physical Android device with USB debugging enabled for device testing
+
+The build helper checks `BAKESMART_JAVA_HOME` first, then a project-local JDK under `.tools/jdk-21/`, then `JAVA_HOME`. It detects the conventional Windows Android SDK location when `ANDROID_HOME` and `ANDROID_SDK_ROOT` are not set. This avoids changing global Java settings on machines that use an older system Java.
+
+Build the web game and synchronize it into the native Android wrapper:
+
+```powershell
+npm run android:sync
+```
+
+Build a debug APK, including a fresh web build and Capacitor sync:
+
+```powershell
+npm run android:build:debug
+```
+
+The generated client-testing APK is written to:
+
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+To test on a connected physical device:
+
+```powershell
+adb devices
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+adb shell am start -n com.bakesmart2d.app/.MainActivity
+```
+
+Test launch, landscape layout, touch interaction, all three learning outcomes, results, navigation, and background/resume on the physical device. A production release requires a private release signing key and a separately configured signed release build; the debug APK must not be represented as production-signed.

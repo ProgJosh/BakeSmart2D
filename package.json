@@ -14,12 +14,18 @@
     "preview": "vite preview",
     "desktop:dev": "npm run build && electron .",
     "desktop:dir": "npm run build && electron-builder --win dir --x64",
-    "desktop:package": "npm run build && electron-builder --win nsis --x64"
+    "desktop:package": "npm run build && electron-builder --win nsis --x64",
+    "android:sync": "npm run build && cap sync android",
+    "android:build:debug": "npm run android:sync && node scripts/android-build.mjs",
+    "android:open": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "8.5.0",
+    "@capacitor/core": "8.5.0",
     "phaser": "^3.90.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.0",
     "electron": "44.0.0",
     "electron-builder": "26.15.3",
     "qrcode": "^1.5.4",
