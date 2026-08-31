@@ -9,6 +9,7 @@ import { ChallengeScene } from './scenes/ChallengeScene';
 import { DecorateScene } from './scenes/DecorateScene';
 import { StoragePackScene } from './scenes/StoragePackScene';
 import { ResultScene } from './scenes/ResultScene';
+import { installPlatformRuntime } from './core/PlatformRuntime';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -40,4 +41,5 @@ const config: Phaser.Types.Core.GameConfig = {
   ]
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+installPlatformRuntime(game);

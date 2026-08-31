@@ -3,6 +3,7 @@ import { C, FONT, GAME_W, HEX } from '../core/theme';
 import { bgDecor, makeButton, fadeToScene, makePanel, makeChip, makeDots, makeSectionLabel } from '../ui/UiFactory';
 import { findLesson } from '../data/lessons';
 import { GS } from '../core/GameState';
+import { UI_LAYOUT } from '../core/layout';
 
 interface LessonData {
   lessonId: string;
@@ -44,7 +45,7 @@ export class LessonScene extends Phaser.Scene {
     const cx = GAME_W / 2;
 
     makeChip(this, 162, 54, `${this.lesson.lo} \u00b7 WEEK ${this.lesson.week}`, C.wheat, HEX.ink, 14);
-    makeChip(this, GAME_W - 156, 54, `PAGE ${this.pageIndex + 1} OF ${this.lesson.pages.length}`, C.cardWarm, HEX.inkSoft, 13);
+    makeChip(this, GAME_W - 156, 54, `PAGE ${this.pageIndex + 1} OF ${this.lesson.pages.length}`, C.cardWarm, HEX.inkSoft, 14);
 
     this.add
       .text(100, 100, this.lesson.topic, { fontFamily: FONT, fontSize: '27px', fontStyle: 'bold', color: HEX.ink, wordWrap: { width: 980 } })
@@ -76,7 +77,7 @@ export class LessonScene extends Phaser.Scene {
     if (page.points.length > 0) {
       y += 8;
       this.add
-        .text(cx - 470, y, 'KEY POINTS', { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.inkSoft, letterSpacing: 1 })
+        .text(cx - 470, y, 'KEY POINTS', { fontFamily: FONT, fontSize: '15px', fontStyle: 'bold', color: HEX.inkSoft, letterSpacing: 1 })
         .setOrigin(0, 0);
       y += 22;
 
@@ -99,7 +100,7 @@ export class LessonScene extends Phaser.Scene {
     makeButton(
       this,
       cx - 160,
-      680,
+      UI_LAYOUT.safeNavigationY,
       180,
       58,
       this.pageIndex === 0 ? 'LEARNING HUB' : 'BACK',
@@ -109,7 +110,7 @@ export class LessonScene extends Phaser.Scene {
       },
       { variant: 'secondary', fontSize: 18 }
     );
-    makeButton(this, cx + 180, 680, isLast ? 280 : 180, 58, nextLabel, () => this.nextPage(), { variant: nextVariant, fontSize: 18 });
+    makeButton(this, cx + 180, UI_LAYOUT.safeNavigationY, isLast ? 280 : 180, 58, nextLabel, () => this.nextPage(), { variant: nextVariant, fontSize: 18 });
   }
 
   private prevPage(): void {

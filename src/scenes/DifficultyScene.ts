@@ -4,6 +4,7 @@ import { bgDecor, makeOptionTile, makeButton, fadeToScene, makeChip, makePanel, 
 import { DIFFICULTY_LIST } from '../data/challenges';
 import { GS } from '../core/GameState';
 import { OUTCOMES } from '../data/lessons';
+import { UI_LAYOUT } from '../core/layout';
 
 interface DifficultyData {
   lo: 'LO1' | 'LO2' | 'LO3';
@@ -40,7 +41,7 @@ export class DifficultyScene extends Phaser.Scene {
 
     // Keep the learning-outcome marker separate from the page title so LO1,
     // LO2, and LO3 remain immediately readable at every difficulty screen.
-    makeChip(this, GAME_W - 166, 92, `${this.lo} · LEARNING OUTCOME`, outcome.color, HEX.white, 13);
+    makeChip(this, GAME_W - 166, 92, `${this.lo} · LEARNING OUTCOME`, outcome.color, HEX.white, 14);
 
     this.add
       .text(140, 82, 'Select Difficulty', { fontFamily: FONT, fontSize: '28px', fontStyle: 'bold', color: HEX.ink })
@@ -97,7 +98,7 @@ export class DifficultyScene extends Phaser.Scene {
     continueBtn.setEnabled(true);
 
     this.add
-      .text(cx, 704, 'Hint tokens and scoring vary by difficulty', { fontFamily: FONT, fontSize: '14px', color: HEX.inkSoft })
+      .text(cx, UI_LAYOUT.safeFooterY, 'Hint tokens and scoring vary by difficulty', { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
       .setOrigin(0.5)
       .setAlpha(0.7);
 

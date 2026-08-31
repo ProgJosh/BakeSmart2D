@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { C, FONT, GAME_W, HEX } from '../core/theme';
 import { bgDecor, makeButton, fadeToScene, makePanel, makeStars, makeChip, makeSectionLabel } from '../ui/UiFactory';
 import { GS } from '../core/GameState';
+import { DIFFICULTIES } from '../data/challenges';
+import { UI_LAYOUT } from '../core/layout';
 
 export class ResultScene extends Phaser.Scene {
   constructor() {
@@ -55,7 +57,7 @@ export class ResultScene extends Phaser.Scene {
         .text(cx - 414, y, `${stage.label}`, { fontFamily: FONT, fontSize: '15px', fontStyle: 'bold', color: HEX.ink, wordWrap: { width: 400 } })
         .setOrigin(0, 0);
       this.add
-        .text(cx - 414, y + 20, stage.feedback, { fontFamily: FONT, fontSize: '12px', color: HEX.inkSoft, wordWrap: { width: 590 }, lineSpacing: 2 })
+        .text(cx - 414, y + 20, stage.feedback, { fontFamily: FONT, fontSize: '13px', color: HEX.inkSoft, wordWrap: { width: 590 }, lineSpacing: 2 })
         .setOrigin(0, 0);
       this.add
         .text(cx + 480, y + 6, `${stage.score}/${stage.max}`, { fontFamily: FONT, fontSize: '16px', fontStyle: 'bold', color: stageColor === C.green ? HEX.green : HEX.primaryDark })
@@ -65,14 +67,23 @@ export class ResultScene extends Phaser.Scene {
       }
     });
 
-    makeButton(this, cx - 170, 690, 300, 60, 'CONTINUE LEARNING', () => fadeToScene(this, 'LearnHub'), {
-      variant: 'primary',
-      fontSize: 19,
+    makeButton(this, cx - 310, UI_LAYOUT.safeNavigationY, 190, 60, 'RETRY ACTIVITY', () => {
+      GS.startActivity(DIFFICULTIES[GS.difficulty].hints);
+      const targetScene = result.lo === 'LO1' ? 'Challenge' : result.lo === 'LO2' ? 'Decorate' : 'StoragePack';
+      fadeToScene(this, targetScene, { lo: result.lo });
+    }, {
+      variant: 'secondary',
+      fontSize: 17,
       radius: 30
     });
-    makeButton(this, cx + 170, 690, 240, 60, 'MAIN MENU', () => fadeToScene(this, 'Menu'), {
+    makeButton(this, cx, UI_LAYOUT.safeNavigationY, 300, 60, 'CONTINUE LEARNING', () => fadeToScene(this, 'LearnHub'), {
+      variant: 'primary',
+      fontSize: 18,
+      radius: 30
+    });
+    makeButton(this, cx + 310, UI_LAYOUT.safeNavigationY, 200, 60, 'MAIN MENU', () => fadeToScene(this, 'Menu'), {
       variant: 'secondary',
-      fontSize: 19,
+      fontSize: 18,
       radius: 30
     });
   }

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { C, FONT, GAME_W, GAME_H, HEX } from '../core/theme';
+import { touchHitSize } from '../core/layout';
 
 export interface UIButton extends Phaser.GameObjects.Container {
   setEnabled(v: boolean): void;
@@ -11,6 +12,9 @@ export interface UIOptionTile extends Phaser.GameObjects.Container {
 }
 
 type Variant = 'primary' | 'secondary' | 'flat' | 'danger';
+type ButtonOptions = { variant?: Variant; fontSize?: number; radius?: number; once?: boolean; minHitSize?: number };
+
+const transitioningScenes = new WeakSet<Phaser.Scene>();
 
 export function bgDecor(scene: Phaser.Scene): void {
   const g = scene.add.graphics();
@@ -64,7 +68,7 @@ export function makeButton(
   h: number,
   label: string,
   onPress: () => void,
-  opts: { variant?: Variant; fontSize?: number; radius?: number } = {}
+  opts: ButtonOptions = {}
 ): UIButton {
   const variant = opts.variant ?? 'secondary';
   const cont = scene.add.container(x, y);
@@ -78,6 +82,7 @@ export function makeButton(
     })
     .setOrigin(0.5);
   let enabled = true;
+  let activated = false;
   const r = Math.min(opts.radius ?? 16, h / 2);
   const paint = () => {
     g.clear();
@@ -90,7 +95,8 @@ export function makeButton(
     g.lineStyle(2, edge, 0.95).strokeRoundedRect(-w / 2, -h / 2, w, h, r);
     g.lineStyle(2, 0xffffff, variant === 'primary' ? 0.3 : 0.72).lineBetween(-w / 2 + r, -h / 2 + 3, w / 2 - r, -h / 2 + 3);
   };
-  const zone = scene.add.zone(0, 0, w, h).setInteractive({ useHandCursor: true });
+  const hitSize = touchHitSize(w, h, opts.minHitSize);
+  const zone = scene.add.zone(0, 0, hitSize.width, hitSize.height).setInteractive({ useHandCursor: true });
   zone.on('pointerdown', () => {
     if (!enabled) return;
     cont.setScale(0.97);
@@ -101,15 +107,20 @@ export function makeButton(
     txt.y = 0;
   });
   zone.on('pointerup', () => {
-    if (!enabled) return;
+    if (!enabled || (opts.once && activated)) return;
     cont.setScale(1);
     txt.y = 0;
+    if (opts.once) {
+      activated = true;
+      zone.disableInteractive();
+    }
     onPress();
   });
   paint();
   cont.add([g, txt, zone]);
   (cont as UIButton).setEnabled = (v: boolean) => {
     enabled = v;
+    if (v) activated = false;
     g.alpha = v ? 1 : 0.5;
     txt.alpha = v ? 1 : 0.55;
     if (v) zone.setInteractive({ useHandCursor: true });
@@ -146,7 +157,7 @@ export function makeOptionTile(
     const descTxt = scene.add
       .text(-w / 2 + 26, 15, opts.desc ?? '', {
         fontFamily: FONT,
-        fontSize: '14px',
+        fontSize: '16px',
         color: HEX.inkSoft,
         wordWrap: { width: w - 100 }
       })
@@ -240,15 +251,20 @@ export function makeStars(scene: Phaser.Scene, cx: number, y: number, size: numb
 
 export function makeSectionLabel(scene: Phaser.Scene, x: number, y: number, label: string, color: number = C.primary): void {
   scene.add
-    .text(x, y, label.toUpperCase(), { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: HEX.inkSoft })
+    .text(x, y, label.toUpperCase(), { fontFamily: FONT, fontSize: '14px', fontStyle: 'bold', color: HEX.inkSoft })
     .setOrigin(0, 0.5)
     .setLetterSpacing(2);
   scene.add.rectangle(x + 12, y + 18, 74, 4, color, 0.95).setOrigin(0, 0.5);
 }
 
 export function fadeToScene(scene: Phaser.Scene, key: string, data?: Record<string, unknown>): void {
+  if (transitioningScenes.has(scene)) return;
+  transitioningScenes.add(scene);
+  scene.input.enabled = false;
   scene.cameras.main.fadeOut(170, 43, 26, 15);
   scene.cameras.main.once('camerafadeoutcomplete', () => {
+    transitioningScenes.delete(scene);
+    scene.input.enabled = true;
     scene.scene.start(key, data);
   });
 }

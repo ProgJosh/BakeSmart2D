@@ -3,6 +3,7 @@ import { C, FONT, GAME_W, HEX } from '../core/theme';
 import { bgDecor, makeButton, fadeToScene, makeChip, makePanel, makeSectionLabel } from '../ui/UiFactory';
 import { LO3_HANDLING, LO3_DESTS, LO3_PAIRS, LO3_PACKAGING } from '../data/challenges';
 import { GS, type StageRecord } from '../core/GameState';
+import { UI_LAYOUT } from '../core/layout';
 
 export class StoragePackScene extends Phaser.Scene {
   private records: StageRecord[] = [];
@@ -66,14 +67,14 @@ export class StoragePackScene extends Phaser.Scene {
   private renderHint(hint: string): void {
     const cx = GAME_W / 2;
     const hintText = this.add
-      .text(cx, 292, '', { fontFamily: FONT, fontSize: '15px', color: HEX.primaryDark, wordWrap: { width: 900 }, align: 'center', fontStyle: 'italic' })
+      .text(cx, 292, '', { fontFamily: FONT, fontSize: '16px', color: HEX.primaryDark, wordWrap: { width: 900 }, align: 'center', fontStyle: 'italic' })
       .setOrigin(0.5);
-    const hintBtn = makeButton(this, GAME_W - 120, 112, 200, 40, 'SHOW HINT', () => {
+    const hintBtn = makeButton(this, GAME_W - 120, 112, 200, UI_LAYOUT.compactControlHeight, 'SHOW HINT', () => {
       if (GS.spendHint()) {
         hintText.setText(hint);
         hintBtn.setVisible(false);
       }
-    }, { variant: 'secondary', fontSize: 15, radius: 20 });
+    }, { variant: 'secondary', fontSize: 16, radius: 24 });
   }
 
   private renderMcq(
@@ -92,7 +93,7 @@ export class StoragePackScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     const w = 820;
-    const rowH = 64;
+    const rowH = 72;
     const chosen = new Set<number>();
     const conts: Phaser.GameObjects.Container[] = [];
     const paintRow = (cont: Phaser.GameObjects.Container, on: boolean) => {
@@ -134,11 +135,11 @@ export class StoragePackScene extends Phaser.Scene {
       const ok = pick !== undefined && options[pick].correct;
       this.records.push({ label, score: ok ? 100 : 0, max: 100, feedback: fb });
       onDone();
-    }, { variant: 'primary', fontSize: 20, radius: 26 });
+    }, { variant: 'primary', fontSize: 20, radius: 26, once: true });
 
     this.renderHint(hint);
     this.add
-      .text(cx, 700, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '15px', color: HEX.inkSoft })
+      .text(cx, UI_LAYOUT.safeFooterY, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
       .setOrigin(0.5);
   }
 
@@ -161,7 +162,7 @@ export class StoragePackScene extends Phaser.Scene {
 
     const itemY = 320;
     const itemW = 360;
-    const itemH = 66;
+    const itemH = 72;
     const itemConts: Phaser.GameObjects.Container[] = [];
     LO3_PAIRS.forEach((pair, i) => {
       const x = cx - 320;
@@ -238,11 +239,11 @@ export class StoragePackScene extends Phaser.Scene {
       this.records.push({ label: 'Storage matching', score, max: 100, feedback: fb });
       this.phase = 2;
       this.renderPhase();
-    }, { variant: 'primary', fontSize: 20, radius: 26 });
+    }, { variant: 'primary', fontSize: 20, radius: 26, once: true });
 
     this.renderHint('Match each product to the storage condition that keeps it fresh and safe the longest.');
     this.add
-      .text(cx, 700, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '15px', color: HEX.inkSoft })
+      .text(cx, UI_LAYOUT.safeFooterY, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
       .setOrigin(0.5);
   }
 }

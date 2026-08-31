@@ -32,10 +32,10 @@ export class LearnHubScene extends Phaser.Scene {
       .text(cx, 148, 'Choose a learning outcome and build your bakery skills.', { fontFamily: FONT, fontSize: '18px', color: HEX.inkSoft })
       .setOrigin(0.5);
 
-    makeButton(this, 92, 74, 144, 46, 'MAIN MENU', () => fadeToScene(this, 'Menu'), {
+    makeButton(this, 92, 74, 144, 50, 'MAIN MENU', () => fadeToScene(this, 'Menu'), {
       variant: 'flat',
-      fontSize: 15,
-      radius: 23
+      fontSize: 16,
+      radius: 25
     });
 
     OUTCOMES.forEach((outcome, idx) => {
@@ -110,7 +110,7 @@ export class LearnHubScene extends Phaser.Scene {
     const cx = GAME_W / 2;
 
     makeButton(this, 70, 82, 56, 56, '⟵', () => this.showHub(), { variant: 'flat', fontSize: 28, radius: 28 });
-    makeChip(this, 244, 54, 'CURRICULUM', outcome.color, HEX.white, 13);
+    makeChip(this, 244, 54, 'CURRICULUM', outcome.color, HEX.white, 14);
 
     this.add
       .text(140, 82, `${outcome.title} — Weeks 1–${outcome.lessons.length}`, {

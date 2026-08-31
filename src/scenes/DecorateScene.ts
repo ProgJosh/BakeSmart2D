@@ -7,6 +7,7 @@ import {
   LO2_PRESENTATION
 } from '../data/challenges';
 import { GS, type StageRecord } from '../core/GameState';
+import { touchHitSize, UI_LAYOUT } from '../core/layout';
 
 export class DecorateScene extends Phaser.Scene {
   private selectedTopping = 0;
@@ -127,13 +128,14 @@ export class DecorateScene extends Phaser.Scene {
       const g = this.add.graphics();
       const paint = (on: boolean) => {
         g.clear();
-        g.fillStyle(on ? 0xfff3dd : C.card, 1).fillRoundedRect(-80, -26, 160, 52, 14);
-        g.lineStyle(on ? 4 : 2, on ? C.primary : C.wheatDark, 1).strokeRoundedRect(-80, -26, 160, 52, 14);
+        g.fillStyle(on ? 0xfff3dd : C.card, 1).fillRoundedRect(-80, -30, 160, 60, 14);
+        g.lineStyle(on ? 4 : 2, on ? C.primary : C.wheatDark, 1).strokeRoundedRect(-80, -30, 160, 60, 14);
       };
       paint(i === this.selectedTopping);
       const swatch = this.add.circle(-54, 0, 12, t.color).setStrokeStyle(2, 0x000000, 0.15);
-      const label = this.add.text(-34, 0, t.name, { fontFamily: FONT, fontSize: '14px', color: HEX.ink, wordWrap: { width: 100 } }).setOrigin(0, 0.5);
-      const z = this.add.zone(0, 0, 160, 52).setInteractive({ useHandCursor: true });
+      const label = this.add.text(-34, 0, t.name, { fontFamily: FONT, fontSize: '15px', color: HEX.ink, wordWrap: { width: 100 } }).setOrigin(0, 0.5);
+      const paletteHit = touchHitSize(160, 60, 64);
+      const z = this.add.zone(0, 0, paletteHit.width, paletteHit.height).setInteractive({ useHandCursor: true });
       z.on('pointerup', () => {
         this.selectedTopping = i;
         palettePaint();
@@ -149,8 +151,8 @@ export class DecorateScene extends Phaser.Scene {
           const idx = o.getData('palette') as number;
           const gfx = o.list[0] as Phaser.GameObjects.Graphics;
           gfx.clear();
-          gfx.fillStyle(idx === this.selectedTopping ? 0xfff3dd : C.card, 1).fillRoundedRect(-80, -26, 160, 52, 14);
-          gfx.lineStyle(idx === this.selectedTopping ? 4 : 2, idx === this.selectedTopping ? C.primary : C.wheatDark, 1).strokeRoundedRect(-80, -26, 160, 52, 14);
+          gfx.fillStyle(idx === this.selectedTopping ? 0xfff3dd : C.card, 1).fillRoundedRect(-80, -30, 160, 60, 14);
+          gfx.lineStyle(idx === this.selectedTopping ? 4 : 2, idx === this.selectedTopping ? C.primary : C.wheatDark, 1).strokeRoundedRect(-80, -30, 160, 60, 14);
         }
       });
     };
@@ -165,25 +167,25 @@ export class DecorateScene extends Phaser.Scene {
           : `Decoration needs work: use at least ${req.count} toppings and ${req.kinds} different kinds for a balanced look.`;
       this.records.push({ label: 'Decoration', score, max: 100, feedback: fb });
       this.renderPresent();
-    }, { variant: 'primary', fontSize: 20, radius: 27 });
+    }, { variant: 'primary', fontSize: 20, radius: 27, once: true });
 
     this.renderHint(`Use at least ${req.count} toppings and ${req.kinds} different kinds so the product looks balanced and appealing.`);
     this.add
-      .text(cx, 706, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '15px', color: HEX.inkSoft })
+      .text(cx, UI_LAYOUT.safeFooterY, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
       .setOrigin(0.5);
   }
 
   private renderHint(hint: string): void {
     const cx = GAME_W / 2;
     const hintText = this.add
-      .text(cx, 292, '', { fontFamily: FONT, fontSize: '15px', color: HEX.primaryDark, wordWrap: { width: 900 }, align: 'center', fontStyle: 'italic' })
+      .text(cx, 292, '', { fontFamily: FONT, fontSize: '16px', color: HEX.primaryDark, wordWrap: { width: 900 }, align: 'center', fontStyle: 'italic' })
       .setOrigin(0.5);
-    const hintBtn = makeButton(this, GAME_W - 120, 112, 200, 40, 'SHOW HINT', () => {
+    const hintBtn = makeButton(this, GAME_W - 120, 112, 200, UI_LAYOUT.compactControlHeight, 'SHOW HINT', () => {
       if (GS.spendHint()) {
         hintText.setText(hint);
         hintBtn.setVisible(false);
       }
-    }, { variant: 'secondary', fontSize: 15, radius: 20 });
+    }, { variant: 'secondary', fontSize: 16, radius: 24 });
   }
 
   private renderPresent(): void {
@@ -207,7 +209,7 @@ export class DecorateScene extends Phaser.Scene {
 
     const opts = LO2_PRESENTATION.options;
     const w = 820;
-    const rowH = 64;
+    const rowH = 72;
     const chosen = new Set<number>();
     const conts: Phaser.GameObjects.Container[] = [];
     const paintRow = (cont: Phaser.GameObjects.Container, on: boolean) => {
@@ -255,11 +257,11 @@ export class DecorateScene extends Phaser.Scene {
       });
       const result = GS.finishActivity('LO2', 'LO2 decoration activity complete', this.records);
       fadeToScene(this, 'Result', { result });
-    }, { variant: 'primary', fontSize: 20, radius: 26 });
+    }, { variant: 'primary', fontSize: 20, radius: 26, once: true });
 
     this.renderHint('Arrange items neatly on a clean plate — a tidy, even layout looks professional.');
     this.add
-      .text(cx, 700, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '15px', color: HEX.inkSoft })
+      .text(cx, UI_LAYOUT.safeFooterY, `Hints left: ${GS.hintsLeft}`, { fontFamily: FONT, fontSize: '16px', color: HEX.inkSoft })
       .setOrigin(0.5);
   }
 }

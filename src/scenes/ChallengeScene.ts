@@ -12,6 +12,7 @@ import {
   type OrderStage
 } from '../data/challenges';
 import { GS, type StageRecord } from '../core/GameState';
+import { UI_LAYOUT } from '../core/layout';
 
 export class ChallengeScene extends Phaser.Scene {
   private stages: AnyStage[] = [];
@@ -114,9 +115,9 @@ export class ChallengeScene extends Phaser.Scene {
     this.renderHint(stage);
 
     this.add
-      .text(cx, 688, `Hints left: ${GS.hintsLeft}`, {
+      .text(cx, UI_LAYOUT.safeFooterY, `Hints left: ${GS.hintsLeft}`, {
         fontFamily: FONT,
-        fontSize: '15px',
+        fontSize: '16px',
         color: HEX.inkSoft
       })
       .setOrigin(0.5);
@@ -125,36 +126,44 @@ export class ChallengeScene extends Phaser.Scene {
   private renderHint(stage: AnyStage): void {
     const cx = GAME_W / 2;
     const hintText = this.add
-      .text(cx, 292, '', { fontFamily: FONT, fontSize: '15px', color: HEX.primaryDark, wordWrap: { width: 900 }, align: 'center', fontStyle: 'italic' })
+      .text(cx, 292, '', { fontFamily: FONT, fontSize: '16px', color: HEX.primaryDark, wordWrap: { width: 900 }, align: 'center', fontStyle: 'italic' })
       .setOrigin(0.5);
 
-    const hintBtn = makeButton(this, GAME_W - 120, 112, 200, 40, 'SHOW HINT', () => {
+    const hintBtn = makeButton(this, GAME_W - 120, 112, 200, UI_LAYOUT.compactControlHeight, 'SHOW HINT', () => {
       if (GS.spendHint()) {
         this.hintUsedThisStage = true;
         hintText.setText(stage.hint);
         hintBtn.setVisible(false);
       }
-    }, { variant: 'secondary', fontSize: 15, radius: 20 });
+    }, { variant: 'secondary', fontSize: 16, radius: 24 });
   }
 
   private renderChoice(stage: SelectStage | McqStage, multi: boolean): void {
     const cx = GAME_W / 2;
     const selected = new Set<number>();
+    const optionPainters: Array<() => void> = [];
     const opts = (stage as SelectStage).options;
     const N = opts.length;
 
-    const top = 318;
-    const bottomLimit = 602;
-    const gap = 5;
-    let rowH = Math.floor((bottomLimit - top - (N - 1) * gap) / N);
-    rowH = Math.max(28, Math.min(54, rowH));
-    const step = rowH + gap;
+    const columns = N > 5 ? 2 : 1;
+    const rows = Math.ceil(N / columns);
+    const top = 310;
+    const bottomLimit = 610;
+    const rowGap = 8;
+    const columnGap = 16;
+    let rowH = Math.floor((bottomLimit - top - (rows - 1) * rowGap) / rows);
+    rowH = Math.max(56, Math.min(72, rowH));
+    const step = rowH + rowGap;
     const startY = top + rowH / 2;
-    const w = 760;
+    const totalW = columns === 2 ? 860 : 760;
+    const w = (totalW - (columns - 1) * columnGap) / columns;
 
     opts.forEach((opt, i) => {
-      const y = startY + i * step;
-      const cont = this.add.container(cx, y);
+      const row = Math.floor(i / columns);
+      const column = i % columns;
+      const x = cx + (column - (columns - 1) / 2) * (w + columnGap);
+      const y = startY + row * step;
+      const cont = this.add.container(x, y);
       const g = this.add.graphics();
       const txt = this.add
         .text(-w / 2 + 24, 0, opt.text, { fontFamily: FONT, fontSize: '17px', color: HEX.ink, wordWrap: { width: w - 70 } })
@@ -183,6 +192,7 @@ export class ChallengeScene extends Phaser.Scene {
         }
       };
       paint(false);
+      optionPainters.push(() => paint(selected.has(i)));
       const zone = this.add.zone(0, 0, w, rowH).setInteractive({ useHandCursor: true });
       zone.on('pointerup', () => {
         if (multi) {
@@ -192,7 +202,7 @@ export class ChallengeScene extends Phaser.Scene {
           selected.clear();
           selected.add(i);
         }
-        paint(selected.has(i));
+        optionPainters.forEach((repaint) => repaint());
       });
       cont.add([g, txt, circle, zone]);
       this.add.existing(cont);
@@ -206,7 +216,7 @@ export class ChallengeScene extends Phaser.Scene {
             chosen.every((i) => opts[i].correct)
           : chosen.length === 1 && opts[chosen[0]].correct;
       this.scoreStage(ok ? 100 : 0, stage.fb);
-    }, { variant: 'primary', fontSize: 20, radius: 27 });
+    }, { variant: 'primary', fontSize: 20, radius: 27, once: true });
   }
 
   private renderMeasure(stage: MeasureStage): void {
@@ -237,7 +247,7 @@ export class ChallengeScene extends Phaser.Scene {
     makeButton(this, cx, 540, 220, 52, 'SUBMIT', () => {
       const ok = Math.abs(value - stage.target) <= tol;
       this.scoreStage(ok ? 100 : 0, ok ? stage.fb : `${stage.fb} (You set ${value} ${stage.unit}.)`);
-    }, { variant: 'primary', fontSize: 20, radius: 26 });
+    }, { variant: 'primary', fontSize: 20, radius: 26, once: true });
   }
 
   private renderDial(stage: DialStage): void {
@@ -273,7 +283,7 @@ export class ChallengeScene extends Phaser.Scene {
     makeButton(this, cx, 540, 220, 52, 'SUBMIT', () => {
       const ok = Math.abs(value - stage.target) <= tol;
       this.scoreStage(ok ? 100 : 0, ok ? stage.fb : `${stage.fb} (You set ${value} ${stage.unit}.)`);
-    }, { variant: 'primary', fontSize: 20, radius: 26 });
+    }, { variant: 'primary', fontSize: 20, radius: 26, once: true });
   }
 
   private renderOrder(stage: OrderStage): void {
@@ -302,14 +312,14 @@ export class ChallengeScene extends Phaser.Scene {
           const up = makeButton(this, w / 2 - 40, 0, 44, 44, '↑', () => {
             [order[pos - 1], order[pos]] = [order[pos], order[pos - 1]];
             redraw();
-          }, { variant: 'flat', fontSize: 22, radius: 22 });
+          }, { variant: 'flat', fontSize: 22, radius: 22, minHitSize: 48 });
           cont.add(up);
         }
         if (pos < order.length - 1) {
           const down = makeButton(this, w / 2 + 20, 0, 44, 44, '↓', () => {
             [order[pos], order[pos + 1]] = [order[pos + 1], order[pos]];
             redraw();
-          }, { variant: 'flat', fontSize: 22, radius: 22 });
+          }, { variant: 'flat', fontSize: 22, radius: 22, minHitSize: 48 });
           cont.add(down);
         }
         rowsLayer.add(cont);
@@ -318,7 +328,7 @@ export class ChallengeScene extends Phaser.Scene {
       const submit = makeButton(this, cx, 660, 220, 52, 'SUBMIT', () => {
         const ok = order.every((v, i) => v === i);
         this.scoreStage(ok ? 100 : 0, stage.fb);
-      }, { variant: 'primary', fontSize: 20, radius: 26 });
+      }, { variant: 'primary', fontSize: 20, radius: 26, once: true });
       rowsLayer.add(submit);
     };
 
@@ -371,7 +381,7 @@ export class ChallengeScene extends Phaser.Scene {
         this.hintUsedThisStage = false;
         this.renderStage();
       }
-    }, { variant: 'primary', fontSize: 20, radius: 28 });
+    }, { variant: 'primary', fontSize: 20, radius: 28, once: true });
     overlay.add(btn);
   }
 }
